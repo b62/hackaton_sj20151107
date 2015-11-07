@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+
+  <div class="container">
+
+    <div class="jumbotron">
+      <span id="statusInfo"></span>
+      <span id="ledInfo"></span>
+      <span id="tempInfo"></span>
+      <span id="pressInfo"></span>
+      <span id="humidInfo"></span>
+    </div>
+
+    <div class="row">
+      <a class="col-xs-6 btn btn-primary" id="btnOn" value="on">On</a>
+      <a class="col-xs-6 btn btn-primary" id="btnOff" value="off">Off</a>
+      <div class="col-xs-6 result" ></div>
+    </div>
+  </div>
+
+
+  <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+  <script>
+    $(document).ready(function(){
+
+      function cl(obj){
+        console.log(obj);
+      }
+
+      $('#btnOn, #btnOff').click(function(){
+        var command = $(this).attr('value');
+        sendCommand(command);
+      });
+
+      function sendCommand(command){
+//        $.ajax({
+//          url: "https://api.particle.io/v1/devices/3b0040000447343138333038/led?access_token=d853c35e45a0251550c68133a9e2081f26c49f26",
+//          data: command,
+//          method: 'POST',
+//          context: document.body
+//        }).done(function() {
+//          $( this ).addClass( "done" );
+//        });
+
+        cl(command);
+
+        $.post( "https://api.particle.io/v1/devices/3b0040000447343138333038/led?access_token=d853c35e45a0251550c68133a9e2081f26c49f26",
+          {'args': command},
+          function( data ) {
+            $( ".result" ).html( data );
+            cl(data);
+
+            $('#ledInfo').html( data.return_value ? 'on' : 'off' );
+
+
+        });
+      }
+
+    });
+  </script>
+</body>
+</html>
