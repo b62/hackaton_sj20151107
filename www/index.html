@@ -1,69 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link href="../dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link href="../dist/css/bootstrap.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 
 
-  <div class="container">
+<div class="container">
+  <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main'>
+    <h1 class="page-header" style='padding-top:12px; padding-bottom:20px;'>Dashboard</h1>
+  </div>
 
-    <div class="jumbotron">
-      <span id="statusInfo"></span>
-      <span id="ledInfo"></span>
-      <span id="tempInfo"></span>
-      <span id="pressInfo"></span>
-      <span id="humidInfo"></span>
+  <select id="devicesSelect"></select>
+
+  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+    <div class="row placeholders">
+      <div class="col-xs-6 col-sm-2 placeholder">
+        <img src="../img/temperature_icon.png" width="170" height="170" class="img-responsive"
+             alt="Generic placeholder thumbnail">
+        <h4 style='color:grey'>Temperature</h4>
+
+        <h2 style='padding-left:50px; color:grey' id="tempInfo"></h2>
+      </div>
+      <div class="col-xs-6 col-sm-2 placeholder">
+        <img src="../img/pressure.png" width="170" height="170" class="img-responsive"
+             alt="Generic placeholder thumbnail">
+        <h4 style='color:grey; padding-left:35px'>Pressure</h4>
+
+        <h2 style='padding-left:50px; color:grey'>25 Pa</h2>
+      </div>
+      <div class="col-xs-6 col-sm-2 placeholder">
+        <img src="../img/hum2.png" width="170" height="170" class="img-responsive" alt="Generic placeholder thumbnail"
+             style='padding-bottom:10px'>
+        <h4 style='color:grey; padding-left:35px'>Humidity</h4>
+
+        <h2 style='padding-left:40px; color:grey'>25 Pa</h2>
+      </div>
+
     </div>
 
-    <div class="row">
-      <a class="col-xs-6 btn btn-primary" id="btnOn" value="on">On</a>
-      <a class="col-xs-6 btn btn-primary" id="btnOff" value="off">Off</a>
-      <div class="col-xs-6 result" ></div>
+    <div style='padding-top:50px'></div>
+
+    <div class="col-xs-6 col-sm-2 placeholder">
+      <img src="../img/heat.jpg" width="170" height="170" class="img-responsive" alt="Generic placeholder thumbnail"
+           style='padding-bottom:10px'>
+      <h4 style='color:grey; padding-left:35px'>Heating</h4>
+      <button class='btn btn-danger'>&nbsp &nbsp &nbsp &nbsp ON &nbsp &nbsp &nbsp &nbsp &nbsp</button>
     </div>
+
+    <div class="col-xs-6 col-sm-2 placeholder">
+      <img src="../img/light_bulb.png" width="170" height="170" class="img-responsive"
+           alt="Generic placeholder thumbnail" style='padding-bottom:10px'>
+      <h4 style='color:grey; padding-left:35px'>Light</h4>
+      <button class='btn btn-danger'>&nbsp &nbsp &nbsp &nbsp ON &nbsp &nbsp &nbsp &nbsp &nbsp</button>
+    </div>
+
+    <button id="clear">Clear all</button>
+    <div id='messagesDiv'></div>
+    <!--<input type='text' id='phId' placeholder='phId'/>-->
+    <!--<input type='text' id='phName' placeholder='phName'/>-->
+    <!--<input type='text' id='statusInfo' placeholder='statusInfo'/>-->
+    <!--<input type='text' id='ledInfo' placeholder='ledInfo'/>-->
+    <!--<input type='text' id='tempInfo' placeholder='tempInfo'/>-->
+    <!--<input type='text' id='pressInfo' placeholder='pressInfo'/>-->
+    <!--<input type='text' id='humidInfo' placeholder='humidInfo'/>-->
+    <!--<button id="save">Save</button>-->
   </div>
 
 
-  <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-  <script>
-    $(document).ready(function(){
+  <div class="row">
+    <table class="table table-striped" id='log-table'>
+      <tr>
+        <th>Photon Id</th>
+        <th>Photon Name</th>
+        <th>Status</th>
+        <th>LED Info</th>
+        <th>Temperature</th>
+        <th>Pressure</th>
+        <th>Humidity</th>
+      </tr>
+    </table>
+  </div>
 
-      function cl(obj){
-        console.log(obj);
+
+  <div class="row">
+    <a class="col-xs-6 btn btn-primary" id="btnOn" value="on">On</a>
+    <a class="col-xs-6 btn btn-primary" id="btnOff" value="off">Off</a>
+
+    <div class="col-xs-6 result"></div>
+  </div>
+</div>
+
+
+<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="../bower_components/spark/dist/spark.min.js"></script>
+<script src="../js/firebase.js"></script>
+
+
+<script>
+  $(document).ready(function () {
+
+    var myDataRef = new Firebase('https://intense-heat-3215.firebaseio.com/');
+    $('input').keypress(function (e) {
+      if (e.keyCode == 13) {
+        var phId = $('#phId').val();
+        var phName = $('#phName').val();
+        var statusInfo = $('#statusInfo').val();
+        var ledInfo = $('#ledInfo').val();
+        var tempInfo = $('#tempInfo').val();
+        var pressInfo = $('#pressInfo').val();
+        var humidInfo = $('#humidInfo').val();
+        myDataRef.push({
+          phId: phId,
+          phName: phName,
+          statusInfo: statusInfo,
+          ledInfo: ledInfo,
+          tempInfo: tempInfo,
+          pressInfo: pressInfo,
+          humidInfo: humidInfo
+        });
+
+        humidInfo.val('');
+        $('#phName').val('');
+        $('#statusInfo').val('');
+        $('#ledInfo').val('');
+        $('#tempInfo').val('');
+        $('#pressInfo').val('');
+        $('#humidInfo').val('');
+
       }
+    });
 
-      $('#btnOn, #btnOff').click(function(){
-        var command = $(this).attr('value');
-        sendCommand(command);
-      });
+    $('#clear').click(function (e) {
+      myDataRef.remove();
+    });
 
-      function sendCommand(command){
-//        $.ajax({
-//          url: "https://api.particle.io/v1/devices/3b0040000447343138333038/led?access_token=d853c35e45a0251550c68133a9e2081f26c49f26",
-//          data: command,
-//          method: 'POST',
-//          context: document.body
-//        }).done(function() {
-//          $( this ).addClass( "done" );
+    myDataRef.on('child_added', function (snapshot) {
+      displayChatMessage(snapshot.val());
+    });
+    function displayChatMessage(info) {
+      var message = '<td>phId: ' + info.phId + ' </td>' +
+        '<td>phName: ' + info.phName + ' </td>' +
+        '<td>statusInfo: ' + info.statusInfo + ' </td>' +
+        '<td>ledInfo: ' + info.ledInfo + ' </td>' +
+        '<td>tempInfo: ' + info.tempInfo + ' </td>' +
+        '<td>pressInfo: ' + info.pressInfo + ' </td>' +
+        '<td>humidInfo: ' + info.humidInfo + '</td>';
+      var span = $('<tr/>');
+      span.html(message);
+      span.appendTo($('#log-table'));
+    };
+
+
+    /////////////////////////
+
+    var ph_token = 'd853c35e45a0251550c68133a9e2081f26c49f26',
+      ph_id = '3b0040000447343138333038',
+      devicesSelect = $('#devicesSelect'),
+      devicesList = [],
+      activeDevice;
+
+    function cl(obj) {
+      console.log(obj);
+    }
+
+//      spark.on('login', function() {
+//        //Get all events
+//        spark.getEventStream(false, false, function(data) {
+//          console.log("Event: " + JSON.stringify(data));
 //        });
+//        //Get your devices events
+//        spark.getEventStream(false, 'mine', function(data) {
+//          console.log("Event: " + JSON.stringify(data));
+//        });
+//        //Get test event for specific core
+//        spark.getEventStream('test', 'CORE_ID', function(data) {
+//          console.log("Event: " + JSON.stringify(data));
+//        });
+//      });
 
-        cl(command);
+    spark.on('Measure', function () {
+      console.log("====>Event: " + JSON.stringify(data));
+    });
 
-        $.post( "https://api.particle.io/v1/devices/3b0040000447343138333038/led?access_token=d853c35e45a0251550c68133a9e2081f26c49f26",
-          {'args': command},
-          function( data ) {
-            $( ".result" ).html( data );
-            cl(data);
+    devicesSelect.click(function () {
+      // get device
 
-            $('#ledInfo').html( data.return_value ? 'on' : 'off' );
+      // populate its info
+
+      activeDevice = devicesList[0];
+
+      cl(activeDevice.name);
+
+//          activeDevice.getVariable('analogvalue', function(err, data) {
+//            if (err) {
+//              console.log('An error occurred while getting attrs:', err);
+//            } else {
+//              console.log('Device attr retrieved successfully:', data);
+//            }
+//          });
+
+    });
+
+    function populatePhotonInfo(photon) {
+      $('phName').html(photon.name);
+      $('phId').html(photon.id)
+      $('connectedStatus').html(photon.connected);
+    }
+
+
+    spark.on('login', function (err, body) {
+      console.log('API call completed on Login event:', body);
+
+
+      /// List all devices
+      var devicesPr = spark.listDevices();
+
+      devicesPr.then(
+        function (devices) {
+          console.log('Devices: ', devices);
+
+          devicesList = devices;
+          activeDevice = devices[0];
+
+          spark.getEventStream(false, 'mine', function (data) {
+
+            // get vars
+            activeDevice.getVariable('temp', function (err, data) {
+              if (err) {
+                console.log('An error occurred while getting attrs:', err);
+              } else {
+                console.log('Device attr retrieved successfully:', data);
+
+                //$('#tempInfo').html(data.result.toFixed(2) + 'C');
+
+              }
+            });
+
+            console.log("Event: " + JSON.stringify(data));
+            $('#tempInfo').html(new Number(data.data).toFixed(2) + ' C');
+          });
+
+          // add to select
+          for (var d in devices) {
+            var device = devices[d];
+            cl(device);
+            cl(device.id);
+            cl('Device name: ' + device.name);
+            cl('- connected?: ' + device.connected);
+            cl('- variables: ' + device.variables);
+            cl('- functions: ' + device.functions);
+            cl('- version: ' + device.version);
+            cl('- requires upgrade?: ' + device.requiresUpgrade);
+
+            devicesSelect.append(
+              $('<option>', {
+                'value': d,
+                'data-id': devicesList[d].id,
+                'text': devicesList[d].name
+              })
+            );
+          }
+        },
+        function (err) {
+          console.log('List devices call failed: ', err);
+        }
+      );
+
+
+    });
+
+    spark.login({accessToken: ph_token});
+
+
+    $('#btnOn, #btnOff').click(function () {
+      var command = $(this).attr('value');
+      sendCommand(command);
+    });
+
+    function sendCommand(command) {
+
+      cl(command);
+
+      $.post("https://api.particle.io/v1/devices/" + ph_id + "/led?access_token=" + ph_token,
+        {'args': command},
+        function (data) {
+          $(".result").html(data);
+          cl(data);
+
+          $('#ledInfo').html(data.return_value ? 'on' : 'off');
 
 
         });
-      }
+    }
 
-    });
-  </script>
+  });
+</script>
 </body>
 </html>
